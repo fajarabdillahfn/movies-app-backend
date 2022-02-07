@@ -75,3 +75,28 @@ func (app *application) getAllGenres(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (app *application) getAllMOviesByGenre(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+
+	genre_id, err := strconv.Atoi(params.ByName("genre_id"))
+	if err != nil {
+		app.logger.Print(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	movies, err := app.models.DB.All(genre_id)
+	if err != nil {
+		app.logger.Print(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, movies, "movies")
+	if err != nil {
+		app.logger.Print(err)
+		app.errorJSON(w, err)
+		return
+	}
+}
