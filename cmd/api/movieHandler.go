@@ -27,6 +27,11 @@ func (app *application) getOneMovie(w http.ResponseWriter, r *http.Request) {
 	}
 
 	movie, err := app.models.DB.Get(id)
+	if err != nil {
+		app.logger.Print(err)
+		app.errorJSON(w, err)
+		return
+	}
 
 	err = app.writeJSON(w, http.StatusOK, movie, "movie")
 	if err != nil {
@@ -53,7 +58,32 @@ func (app *application) getAllMovies(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) deleteMovie(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
 
+	id, err := strconv.Atoi(params.ByName("id"))
+	if err != nil {
+		app.logger.Print(errors.New("invalid id parameter"))
+		app.errorJSON(w, err)
+		return
+	}
+
+	err = app.models.DB.DeleteMovie(id)
+	if err != nil {
+		app.logger.Print(err)
+		app.errorJSON(w, err)
+		return
+	}
+
+	ok := jsonResp{
+		OK: true,
+	}
+
+	err = app.writeJSON(w, http.StatusOK, ok, "response")
+	if err != nil {
+		app.logger.Print(err)
+		app.errorJSON(w, err)
+		return
+	}
 }
 
 type MoviePayload struct {
