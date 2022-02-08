@@ -48,16 +48,26 @@ func (app *application) deleteMovie(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (app *application) insertMovie(w http.ResponseWriter, r *http.Request) {
-	
-}
+func (app *application) editMovie(w http.ResponseWriter, r *http.Request) {
+	type jsonResp struct {
+		OK bool `json:"ok"`
+	}
 
-func (app *application) updateMovie(w http.ResponseWriter, r *http.Request) {
-	
+	ok := jsonResp {
+		OK: true,
+	}
+
+	err := app.writeJSON(w, http.StatusOK, ok, "response")
+	if err != nil {
+		app.logger.Print(err)
+		app.errorJSON(w, err)
+		return
+	}
+
 }
 
 func (app *application) searchMovie(w http.ResponseWriter, r *http.Request) {
-	
+
 }
 
 func (app *application) getAllGenres(w http.ResponseWriter, r *http.Request) {
