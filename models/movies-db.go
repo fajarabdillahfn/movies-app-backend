@@ -149,7 +149,7 @@ func (m *DBModel) All(genre ...int) ([]*Movie, error) {
 	return movies, nil
 }
 
-func (m *DBModel) GenresALl() ([]*Genre, error) {
+func (m *DBModel) GenresAll() ([]*Genre, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -181,4 +181,30 @@ func (m *DBModel) GenresALl() ([]*Genre, error) {
 	}
 
 	return genres, nil
+}
+
+func (m *DBModel) InsertMovie(movie Movie) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	stmt := `INSERT INTO movies (title, description, year, release_date, runtime, rating, mpaa_rating, created_at, updated_at)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+
+	_, err := m.DB.ExecContext(ctx, stmt,
+		movie.Title,
+		movie.Description,
+		movie.Year,
+		movie.ReleaseDate,
+		movie.Runtime,
+		movie.Rating,
+		movie.MPAARating,
+		movie.CreatedAt,
+		movie.UpdatedAt,
+	)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
