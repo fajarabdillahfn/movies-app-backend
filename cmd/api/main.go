@@ -70,11 +70,11 @@ func main() {
 		WriteTimeout: 30 * time.Second,
 	}
 
-	logger.Println("Starting server on port", cfg.port)
+	app.logger.Println("Starting server on port", cfg.port)
 
 	err = srv.ListenAndServe()
 	if err != nil {
-		log.Print(err)
+		app.logger.Println(err)
 	}
 }
 
