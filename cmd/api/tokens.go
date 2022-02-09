@@ -58,5 +58,5 @@ func (app *application) signIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	app.writeJSON(w, http.StatusOK, jwtBytes, "response ")
+	app.writeJSON(w, http.StatusOK, string(jwtBytes), "response ")
 }
