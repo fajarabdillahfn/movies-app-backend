@@ -27,7 +27,8 @@ func (app *application) routes() http.Handler {
 	// Get API info
 	router.HandlerFunc(http.MethodGet, "/status", app.statusHandler)
 
-	router.HandlerFunc(http.MethodPost, "/v1/graphql/list", app.moviesGQL)
+	// Get GraphQL
+	router.HandlerFunc(http.MethodPost, "/v1/graphql", app.moviesGQL)
 
 	// Sign in method
 	router.HandlerFunc(http.MethodPost, "/v1/signin", app.signIn)
