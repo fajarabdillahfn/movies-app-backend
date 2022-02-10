@@ -8,9 +8,13 @@ import (
 	"github.com/justinas/alice"
 )
 
+type ctxKey string
+
+const wrapKey ctxKey = "params"
+
 func (app *application) wrap(next http.Handler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
-		ctx := context.WithValue(r.Context(), "params", ps)
+		ctx := context.WithValue(r.Context(), wrapKey, ps)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
@@ -23,12 +27,14 @@ func (app *application) routes() http.Handler {
 	// Get API info
 	router.HandlerFunc(http.MethodGet, "/status", app.statusHandler)
 
+	router.HandlerFunc(http.MethodPost, "/v1/graphql/list", app.moviesGQL)
+
 	// Sign in method
 	router.HandlerFunc(http.MethodPost, "/v1/signin", app.signIn)
 
 	// Get a movie data
 	router.HandlerFunc(http.MethodGet, "/v1/movie/:id", app.getOneMovie)
-	
+
 	// Get all movie data
 	router.HandlerFunc(http.MethodGet, "/v1/movies", app.getAllMovies)
 
@@ -43,6 +49,6 @@ func (app *application) routes() http.Handler {
 
 	// Delete existing data
 	router.GET("/v1/admin/deletemovie/:id", app.wrap(secure.ThenFunc(app.deleteMovie)))
-	
+
 	return app.enableCORS(router)
 }
