@@ -11,7 +11,7 @@ import (
 func (app *application) wrap(next http.Handler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
 		ctx := context.WithValue(r.Context(), "params", ps)
-		next.ServeHTTP(w, r.WithContext((ctx)))
+		next.ServeHTTP(w, r.WithContext(ctx))
 	}
 }
 
