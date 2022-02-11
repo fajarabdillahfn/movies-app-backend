@@ -84,7 +84,7 @@ func (m *DBModel) All(genre ...int) ([]*Movie, error) {
 		where = fmt.Sprintf("WHERE id IN (SELECT movie_id FROM movies_genres WHERE genre_id = %d)", genre[0])
 	}
 
-	query := fmt.Sprintf(`SELECT id, title, description, year, release_date, runtime, mpaa_rating, created_at, updated_at
+	query := fmt.Sprintf(`SELECT id, title, description, year, release_date, runtime, mpaa_rating, created_at, updated_at, COALESCE(poster, '')
 			  FROM movies
 			  %s
 			  ORDER BY title`, where)
@@ -109,6 +109,7 @@ func (m *DBModel) All(genre ...int) ([]*Movie, error) {
 			&movie.MPAARating,
 			&movie.CreatedAt,
 			&movie.UpdatedAt,
+			&movie.Poster,
 		)
 		if err != nil {
 			return nil, err
