@@ -16,7 +16,7 @@ func (m *DBModel) Get(id int) (*Movie, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `SELECT id, title, description, year, release_date, runtime, mpaa_rating, created_at, updated_at
+	query := `SELECT id, title, description, year, release_date, runtime, mpaa_rating, created_at, updated_at, COALESCE(poster, '')
 			  FROM movies
 			  WHERE id = $1`
 
@@ -34,6 +34,7 @@ func (m *DBModel) Get(id int) (*Movie, error) {
 		&movie.MPAARating,
 		&movie.CreatedAt,
 		&movie.UpdatedAt,
+		&movie.Poster,
 	)
 	if err != nil {
 		return nil, err
@@ -187,8 +188,8 @@ func (m *DBModel) InsertMovie(movie Movie) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	stmt := `INSERT INTO movies (title, description, year, release_date, runtime, rating, mpaa_rating, created_at, updated_at)
-			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`
+	stmt := `INSERT INTO movies (title, description, year, release_date, runtime, rating, mpaa_rating, created_at, updated_at, poster)
+			 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9. $10)`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
 		movie.Title,
@@ -200,6 +201,7 @@ func (m *DBModel) InsertMovie(movie Movie) error {
 		movie.MPAARating,
 		movie.CreatedAt,
 		movie.UpdatedAt,
+		movie.Poster,
 	)
 
 	if err != nil {
@@ -221,8 +223,9 @@ func (m *DBModel) UpdateMovie(movie Movie) error {
 				 runtime = $5, 
 				 rating = $6, 
 				 mpaa_rating = $7, 
-				 updated_at = $8
-			 WHERE id = $9`
+				 updated_at = $8,
+				 poster = $9
+			 WHERE id = $10`
 
 	_, err := m.DB.ExecContext(ctx, stmt,
 		movie.Title,
@@ -233,6 +236,7 @@ func (m *DBModel) UpdateMovie(movie Movie) error {
 		movie.Rating,
 		movie.MPAARating,
 		movie.UpdatedAt,
+		movie.Poster,
 		movie.ID,
 	)
 
@@ -244,7 +248,7 @@ func (m *DBModel) UpdateMovie(movie Movie) error {
 }
 
 // Delete one movie and error
-func (m *DBModel) DeleteMovie(id int) (error) {
+func (m *DBModel) DeleteMovie(id int) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
@@ -256,5 +260,5 @@ func (m *DBModel) DeleteMovie(id int) (error) {
 		return err
 	}
 
-	return  nil
+	return nil
 }
